@@ -27,7 +27,8 @@ function generateMap() {
 
   map.on('zoom', (e:Event) => {
     zoom.value = map.getZoom()
-    markerZoom.value = (zoom.value-2.5)*0.12 - 1
+    // markerZoom.value = (zoom.value-2.5)*0.12 - 1
+    markerZoom.value = 1 + (zoom.value - 14) * 1
     if (markerZoom.value < 0) {
       markerZoom.value = 0
     }
@@ -36,7 +37,7 @@ function generateMap() {
 }
 
 function addMarker() {
-  const position = [16.419600898490284,48.16607455063091]
+  const position = [16.40,48.20]
   const point = document.createElement('div');
   point.id = 'marker';
   point.classList.add('tree-container');
@@ -66,9 +67,9 @@ onMounted(() => {
 }
 
 .tree{
-  width: 30px;
-  height: 30px;
-  border-radius: 15px;
+  width: 4px;
+  height: 4px;
+  border-radius: 2px;
   background-color: green;
   transform: scale(v-bind('markerZoom'));
 }
