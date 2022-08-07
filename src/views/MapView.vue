@@ -5,12 +5,28 @@
   </div>
 </template>
 <script setup lang="ts">
-import Mapbox from "mapbox-gl";
+import Mapbox from "mapbox-gl"
+import { supabase } from "@/supabase.js"
 import { onMounted, ref } from 'vue'
 let map:Mapbox;
 let zoom = ref(11)
 let markerZoom = ref(0)
 let currentSelection = ref('')
+
+const loadTable = async () => {
+  // Make a request
+const { data: trees, error } = await supabase
+  .from('trees')
+  .select('*')
+
+if(error) console.log(error)
+else console.log(trees)
+}
+
+loadTable()
+
+
+
 
 function generateMap() {
   Mapbox.accessToken = 'pk.eyJ1Ijoid2Vic2Nyb2xsIiwiYSI6ImNsNW1sYm02ajB1ejczY21ncTBtN2o4NjgifQ.eP6LH-g1PeLwlYbegoxV0A';
@@ -89,17 +105,6 @@ onMounted(() => {
 
 .tree.selected{
   z-index: 1;
-  &::before{
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
-    background-color: #000;
-    z-index: 0;
-  }
-  
+  box-shadow: 0px 0px 0px .5px rgba($color: #000000, $alpha: 1.0);
 }
 </style>
