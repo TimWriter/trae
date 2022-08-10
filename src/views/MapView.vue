@@ -2,6 +2,7 @@
   <div class="map">
     <div id="map-container">
     </div>
+    <TreeInfo :id="selectedTreeID" ref="treeInfoRef" />
   </div>
 </template>
 <script setup lang="ts">
@@ -9,10 +10,34 @@ import Mapbox from "mapbox-gl"
 import TreeHelperService from '@/helpers/TreeHelperService'
 import { MapBoxCoordinates } from "@/typings/typings"
 import { onMounted, ref } from 'vue'
+import TreeInfo from '@/components/TreeInfo.vue'
 let map:Mapbox;
 let zoom = ref(16.2)
-let markerZoom = ref(0)
 let boundingTrees = ref()
+let treeInfoRef = ref()
+let selectedTreeID = ref<number | null>(null)
+
+function selectTree (id:number) {
+  selectedTreeID.value = id;
+  map.setFeatureState(
+    {
+      source: 'trees',
+      id: selectedTreeID.value
+    },
+    {
+      selected: true
+    }
+  );
+  treeInfoRef.value.getTreeFromDB()
+}
+
+function unselectTree () {
+  map.removeFeatureState({
+    source: 'trees',
+    id: selectedTreeID.value
+  });
+  selectedTreeID.value = null;
+}
 
 function addTreeLayer () {
    map.addSource('trees', {
@@ -27,10 +52,31 @@ function addTreeLayer () {
      type: 'circle',
      source: 'trees',
      paint: {
-       'circle-stroke-color': '#0f6633',
-       'circle-stroke-width': 1,
-       'circle-color': '#418754'
-     }
+       'circle-stroke-color': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          '#000',
+          '#446e42'
+        ],
+       'circle-stroke-width': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          2,
+          1
+        ],
+       'circle-color': [
+        'case',
+        ['boolean', ['feature-state', 'selected'], false],
+          '#3aba4f',
+          '#54a862'
+        ],
+        'circle-radius': [
+          'case',
+          ['boolean', ['feature-state', 'selected'], false],
+          7,
+          4
+        ]
+      }
    });
     map.on('mousemove', 'trees-layer', () => {
       map.getCanvas().style.cursor = 'pointer';
@@ -39,11 +85,18 @@ function addTreeLayer () {
     map.on('mouseleave', 'trees-layer', () => {
       map.getCanvas().style.cursor = '';
     })
+
+    map.on('click', 'trees-layer', (event) => {
+      if (selectedTreeID.value !== null) {
+        unselectTree()
+      }
+
+      selectTree(event.features[0].id)
+    })
 }
 
 async function loadTrees (pos: MapBoxCoordinates, bounds:{ _sw:MapBoxCoordinates,_ne:MapBoxCoordinates }, zoom: number) {
-  console.log(pos, zoom)
-  if(zoom >= 14){
+  if(zoom >= 10){
     boundingTrees.value = await TreeHelperService.getAllBoundingTreesGeoJSON(bounds)
     console.log(boundingTrees.value.length)
     if (map.getLayer('trees-layer')) {
@@ -80,12 +133,12 @@ async function generateMap() {
 
   await loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
 
-  map.on('zoomend', (e:Event) => {
+  map.on('zoomend', () => {
     loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
     zoom.value = map.getZoom()
   });
 
-  map.on('moveend', (e:Event) => {
+  map.on('moveend', () => {
     loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
   });
 }

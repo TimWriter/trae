@@ -1,37 +1,7 @@
 import { supabase } from "@/supabase"
-import { MapBoxCoordinates, Tree } from "@/typings/typings"
+import { MapBoxCoordinates, FullTree} from "@/typings/typings"
 
 export default{
-  async getAllTrees():Promise<Tree[]> {
-    const { data: trees, error } = await supabase
-    .from('trees')
-    .select('id,lat,long')
-
-    if(error) {
-      console.log("An error occured while loading the supabase database.", error)
-      return []
-    }
-
-    return trees as Tree[]
-  },
-
-  async getAllBoundingTrees(bounds: { _sw:MapBoxCoordinates,_ne:MapBoxCoordinates }):Promise<Tree[]> {
-    const { data: trees, error } = await supabase
-    .from('trees')
-    .select('id,lat,long')
-    .gt('lat', bounds._sw.lat)
-    .gt('long', bounds._sw.lng)
-    .lt('lat', bounds._ne.lat)
-    .lt('long', bounds._ne.lng)
-
-    if(error) {
-      console.log("An error occured while loading the supabase database.", error)
-      return []
-    }
-
-    return trees as Tree[]
-  },
-
   async getAllBoundingTreesGeoJSON(bounds: { _sw:MapBoxCoordinates,_ne:MapBoxCoordinates }):Promise<object[]> {
     const { data: trees, error } = await supabase
     .from('trees')
@@ -59,5 +29,20 @@ export default{
       })
     })
     return geoJSON
+  },
+  
+  async getTree(id: number):Promise<FullTree | null> {
+    const { data: tree, error } = await supabase
+    .from('trees')
+    .select('*')
+    .eq('id', id)
+    .range(0, 1)
+
+    if(error) {
+      console.log("An error occured while loading the supabase database.", error)
+      return null
+    }
+
+    return tree !== null ? tree[0] : null
   }
 }
