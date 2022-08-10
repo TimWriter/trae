@@ -6,34 +6,71 @@
 </template>
 <script setup lang="ts">
 import Mapbox from "mapbox-gl"
-import { supabase } from "@/supabase.js"
+import TreeHelperService from '@/helpers/TreeHelperService'
+import { MapBoxCoordinates } from "@/typings/typings"
 import { onMounted, ref } from 'vue'
 let map:Mapbox;
-let zoom = ref(11)
+let zoom = ref(16.2)
 let markerZoom = ref(0)
-let currentSelection = ref('')
+let boundingTrees = ref()
 
-const loadTable = async () => {
-  // Make a request
-const { data: trees, error } = await supabase
-  .from('trees')
-  .select('*')
+function addTreeLayer () {
+   map.addSource('trees', {
+     'type': 'geojson',
+     "data": {
+             "type": "FeatureCollection",
+             "features": boundingTrees.value
+         }
+   })
+   map.addLayer({
+     id: 'trees-layer',
+     type: 'circle',
+     source: 'trees',
+     paint: {
+       'circle-stroke-color': '#0f6633',
+       'circle-stroke-width': 1,
+       'circle-color': '#418754'
+     }
+   });
+    map.on('mousemove', 'trees-layer', () => {
+      map.getCanvas().style.cursor = 'pointer';
+    })
 
-if(error) console.log(error)
-else console.log(trees)
+    map.on('mouseleave', 'trees-layer', () => {
+      map.getCanvas().style.cursor = '';
+    })
 }
 
-loadTable()
+async function loadTrees (pos: MapBoxCoordinates, bounds:{ _sw:MapBoxCoordinates,_ne:MapBoxCoordinates }, zoom: number) {
+  console.log(pos, zoom)
+  if(zoom >= 14){
+    boundingTrees.value = await TreeHelperService.getAllBoundingTreesGeoJSON(bounds)
+    console.log(boundingTrees.value.length)
+    if (map.getLayer('trees-layer')) {
+      map.getSource('trees').setData(
+        {
+          "type": "FeatureCollection",
+          "features": boundingTrees.value
+        }
+      );
+    } else {
+      addTreeLayer()
+    }
+  }
+  else{
+    if (map.getLayer('trees-layer')) { 
+      map.removeLayer('trees-layer'); 
+      map.removeSource('trees'); 
+    }
+  }
+}
 
-
-
-
-function generateMap() {
+async function generateMap() {
   Mapbox.accessToken = 'pk.eyJ1Ijoid2Vic2Nyb2xsIiwiYSI6ImNsNW1sYm02ajB1ejczY21ncTBtN2o4NjgifQ.eP6LH-g1PeLwlYbegoxV0A';
   map = new Mapbox.Map({
   container: 'map-container', // container ID
   style: 'mapbox://styles/webscroll/cl5mokzbw000914qh5jjhqprw', // style URL
-  center: [16.40,48.20], // starting position [lng, lat]
+  center: [16.35997475606348,48.20987538428605], // starting position [lng, lat]
   zoom: zoom.value, // starting zoom
   projection: 'globe' // display the map as a 3D globe
   });
@@ -41,45 +78,20 @@ function generateMap() {
     map.setFog({}); // Set the default atmosphere style
   });
 
-  addMarker()
+  await loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
 
-  map.on('zoom', (e:Event) => {
+  map.on('zoomend', (e:Event) => {
+    loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
     zoom.value = map.getZoom()
-    // markerZoom.value = (zoom.value-2.5)*0.12 - 1
-    markerZoom.value = 1 + (zoom.value - 14) * 1
-    if (markerZoom.value < 0) {
-      markerZoom.value = 0
-    }
-    console.log(markerZoom.value)
+  });
+
+  map.on('moveend', (e:Event) => {
+    loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
   });
 }
 
-function selectTree(id:string):void {
-  currentSelection.value = id
-  const tree = document.querySelector(`[data-id="tree-#${id}"]`) as HTMLElement
-  tree.classList.add('selected')
-}
-
-function addMarker() {
-  const position = [16.40,48.20]
-  const point = document.createElement('div');
-  point.id = 'marker';
-  point.classList.add('tree-container');
-  point.innerHTML= `<div class="tree" data-id="tree-#1">`
-
-  new Mapbox.Marker(point)
-  .setLngLat(position)
-  .addTo(map);
-
-  const tree = document.querySelector('[data-id="tree-#1"]') as HTMLElement
-  tree.addEventListener('click', () => {selectTree('1')})
-}
 
 onMounted(() => {
-  let width = document.documentElement.clientWidth
-  if(width < 1200) zoom.value = 10
-  if(width < 500) zoom.value = 9
-  console.log(width)
   generateMap()
 })
 
@@ -91,20 +103,5 @@ onMounted(() => {
   #map-container{
     height: 100vh;
   }
-}
-
-.tree{
-  position: absolute;
-  width: 4px;
-  height: 4px;
-  border-radius: 2px;
-  background-color: green;
-  transform: scale(v-bind('markerZoom'));
-  cursor: pointer;
-}
-
-.tree.selected{
-  z-index: 1;
-  box-shadow: 0px 0px 0px .5px rgba($color: #000000, $alpha: 1.0);
 }
 </style>
