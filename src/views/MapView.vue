@@ -153,8 +153,12 @@ onMounted(() => {
 </script>
 <style lang="scss">
 .map{
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
   #map-container{
-    height: 100vh;
+    height: 100%;
   }
 }
 </style>
