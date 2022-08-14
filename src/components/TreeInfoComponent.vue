@@ -6,27 +6,27 @@
     <h3>Ausgewählter Baum</h3>
     <div class="info">
       <div class="row">
-        <div class="label">Name:</div>
+        <div class="label">Name</div>
         <div class="value">{{ tree.name }}</div>
       </div>
       <div class="row">
-        <div class="label">Baumnummer:</div>
+        <div class="label">Baumnummer</div>
         <div class="value">{{ tree.tree_nr }}</div>
       </div>
       <div class="row">
-        <div class="label">Pflanzjahr:</div>
+        <div class="label">Pflanzjahr</div>
         <div class="value">{{ tree.year }}</div>
       </div>
       <div class="row">
-        <div class="label">Baumhöhe:</div>
+        <div class="label">Baumhöhe</div>
         <div class="value">{{ tree.height }}</div>
       </div>
       <div class="row">
-        <div class="label">Stammumfang:</div>
+        <div class="label">Stammumfang</div>
         <div class="value">{{ tree.circumference }}</div>
       </div>
       <div class="row">
-        <div class="label">Kronendurchmesser:</div>
+        <div class="label">Kronendurchmesser</div>
         <div class="value">{{ tree.crowndiameter }}</div>
       </div>
     </div>
@@ -65,17 +65,18 @@ getTreeFromDB()
   left: 1em;
   bottom: 3em;
   min-height: 200px;
-  min-width: 400px;
+  min-width: 300px;
   padding: 1.5em 2em;
-  background-color: #fff;
   z-index: 1;
   border: 1px solid #ddd;
   border-radius: 20px;
   box-shadow: 0px 0px 15px rgba($color: #000000, $alpha: .2);
   font-family: 'Lato', sans-serif;
+  background-color: #fff;
 
   @media only screen and (max-width: 500px) {
     left: 0;
+    width: calc(100% - 4em - 2px);
     min-width: 0px;
     bottom: 0;
     z-index: 2;
@@ -102,13 +103,13 @@ getTreeFromDB()
   }
 
   h3 {
-    margin: .2em 0 1em 0;
+    margin: -.2em 0 1em 0;
   }
 
   .info {
     .row {
       display: flex;
-      flex-direction: row;
+      flex-direction: column;
       text-align: left;
       margin-top: .4em;
 
@@ -119,6 +120,7 @@ getTreeFromDB()
       .label {
         min-width: 10em;
         font-weight: 600;
+        font-size: .8em;
       }
     }
   }
