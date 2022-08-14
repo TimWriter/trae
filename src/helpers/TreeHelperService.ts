@@ -44,5 +44,19 @@ export default{
     }
 
     return tree !== null ? tree[0] : null
+  },
+
+  async getTreesByTreeNumber(treeNr: string):Promise<FullTree[] | null>{
+    const { data: trees, error } = await supabase
+    .from('trees')
+    .select('*')
+    .eq('tree_nr', treeNr)
+
+    if(error) {
+      console.log("An error occured while loading the supabase database.", error)
+      return null
+    }
+
+    return trees !== null ? trees : null
   }
 }
