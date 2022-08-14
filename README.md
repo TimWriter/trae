@@ -1,4 +1,4 @@
-# trae
+# Baumkataster
 
 ## Project setup
 ```
