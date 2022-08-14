@@ -9,25 +9,37 @@
         <div class="label">Name</div>
         <div class="value">{{ tree.name }}</div>
       </div>
-      <div class="row">
+      <div class="row" v-if="showFullInfo">
         <div class="label">Baumnummer</div>
         <div class="value">{{ tree.tree_nr }}</div>
       </div>
-      <div class="row">
+      <div class="row" v-if="showFullInfo">
         <div class="label">Pflanzjahr</div>
         <div class="value">{{ tree.year }}</div>
       </div>
-      <div class="row">
+      <div class="row" v-if="showFullInfo">
         <div class="label">Baumhöhe</div>
         <div class="value">{{ tree.height }}</div>
       </div>
-      <div class="row">
+      <div class="row" v-if="showFullInfo">
         <div class="label">Stammumfang</div>
         <div class="value">{{ tree.circumference }}</div>
       </div>
-      <div class="row">
+      <div class="row" v-if="showFullInfo">
         <div class="label">Kronendurchmesser</div>
         <div class="value">{{ tree.crowndiameter }}</div>
+      </div>
+      <div class="row" v-if="!showFullInfo">
+        <div class="show-more" @click="showFullInfo = true">
+          <i class="bi bi-chevron-up"></i>
+          Mehr Information
+        </div>
+      </div>
+      <div class="row" v-if="showFullInfo">
+        <div class="show-more" @click="showFullInfo = false">
+          <i class="bi bi-chevron-down"></i>
+          Weniger Information
+        </div>
       </div>
     </div>
   </div>
@@ -41,6 +53,8 @@ const props = defineProps<{
   id: number | null
 }>()
 const tree = ref<FullTree | null>(null)
+const isMobile = ref(window.innerWidth < 500)
+const showFullInfo = ref(!isMobile.value)
 
 function getTreeFromDB() {
   nextTick(async () => {
@@ -64,7 +78,6 @@ getTreeFromDB()
   position: absolute;
   left: 1em;
   bottom: 3em;
-  min-height: 200px;
   min-width: 300px;
   padding: 1.5em 2em;
   z-index: 1;
@@ -121,6 +134,18 @@ getTreeFromDB()
         min-width: 10em;
         font-weight: 600;
         font-size: .8em;
+      }
+
+      .show-more {
+        margin: 1em auto 0 auto;
+        font-weight: 500;
+        color: rgb(82, 163, 76);
+        cursor: pointer;
+
+        i {
+          font-size: .9em;
+          margin-right: .2em;
+        }
       }
     }
   }

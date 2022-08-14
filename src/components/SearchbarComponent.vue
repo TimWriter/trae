@@ -97,6 +97,7 @@ function showSearchResult(result: any) {
   } else {
     emit('showTree', result)
   }
+  closeSearchbar()
 }
 </script>
 <style lang="scss">

@@ -121,6 +121,7 @@ function showTree(tree: FullTree) {
   selectTree(tree.id)
   map.flyTo({
     center: [tree.long, tree.lat],
+    zoom: 19,
     essential: true // this animation is considered essential with respect to prefers-reduced-motion
   });
 }
