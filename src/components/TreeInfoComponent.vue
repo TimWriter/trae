@@ -76,7 +76,7 @@ getTreeFromDB()
 
   @media only screen and (max-width: 500px) {
     left: 0;
-    width: calc(100% - 2px);
+    min-width: 0px;
     bottom: 0;
     z-index: 2;
     border-radius: 20px 20px 0 0;

@@ -1,9 +1,10 @@
 <template>
   <div class="searchbar-container">
     <div class="input-container" @click="openSearchbar()" :class="isExtended ? 'extended' : ''">
-      <input type="search" v-if="isExtended" v-model="searchBarModel" @keyup="searchAPI()" @blur="closeSearchbar()"
+      <input type="search" v-if="isExtended" v-model="searchBarModel" @keyup="searchAPI()" @blur="exitSearchbar()"
         ref="searchBarRef" autocomplete="false" placeholder="Adresse, #Baumnummer">
-      <i class="bi bi-search"></i>
+      <i v-if="!isExtended" class="bi bi-search"></i>
+      <i v-else class="bi bi-x" @click="closeSearchbar()"></i>
       <div v-if="results.length > 0" class="results">
         <div class="row" v-for="item in results" :key="item" @click="showSearchResult(item)">
           <div class="icon">
@@ -35,7 +36,7 @@
 <script setup lang="ts">
 import "bootstrap-icons/font/bootstrap-icons.css";
 import TreeHelperService from '@/helpers/TreeHelperService'
-import { ref } from "vue";
+import { nextTick, ref } from "vue";
 import axios from "axios"
 
 const isExtended = ref(false)
@@ -45,16 +46,25 @@ const results = ref<Array<any>>([])
 const emit = defineEmits(['showPOI', 'showTree'])
 
 function openSearchbar() {
-  isExtended.value = true
+  if (!isExtended.value)
+    isExtended.value = true
   setTimeout(() => {
     searchBarRef.value?.focus()
   }, 1)
 }
 
-function closeSearchbar() {
+function exitSearchbar() {
   if (searchBarModel.value.length < 1) {
     isExtended.value = false
   }
+}
+
+function closeSearchbar() {
+  results.value = []
+  setTimeout(() => {
+    isExtended.value = false
+  }, 1)
+
 }
 
 async function searchAPI() {
@@ -64,7 +74,8 @@ async function searchAPI() {
         q: searchBarModel.value,
         format: 'json',
         addressdetails: 1,
-        countrycode: 'AT',
+        viewbox: '18.235355189567343,50.201870291472034,8.38194241488577,44.83225864460698',
+        bounded: 1,
         email: 'tim.schreiber@outlook.com',
         limit: 5,
         'accept-language': 'de,en'
@@ -153,7 +164,7 @@ function showSearchResult(result: any) {
       position: absolute;
       width: 100%;
       height: auto;
-      max-height: 400px;
+      max-height: 200px;
       overflow-y: auto;
       background-color: rgb(241, 241, 241);
       top: 50%;
@@ -193,8 +204,20 @@ function showSearchResult(result: any) {
   }
 
   .extended {
+    cursor: auto;
+
     i {
-      margin-right: 16px;
+      margin-right: 12px;
+      cursor: pointer;
+      font-size: 1.6em;
+      width: 30px;
+      height: 30px;
+      border-radius: 15px;
+      transition-duration: .2s;
+
+      &:hover {
+        background-color: #ddd;
+      }
     }
 
     &:hover {

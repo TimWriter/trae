@@ -126,6 +126,7 @@ function showTree(tree: FullTree) {
 }
 
 async function loadTrees(pos: MapBoxCoordinates, bounds: { _sw: MapBoxCoordinates, _ne: MapBoxCoordinates }, zoom: number) {
+  console.log(bounds)
   if (zoom >= 10) {
     boundingTrees.value = await TreeHelperService.getAllBoundingTreesGeoJSON(bounds)
     console.log(boundingTrees.value.length)
