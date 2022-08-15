@@ -3,7 +3,7 @@
     <div id="map-container">
     </div>
     <SearchbarComponent @showPOI="showPOI" @showTree="showTree" />
-    <TreeInfo :id="selectedTreeID" @unselect="unselectTree()" ref="treeInfoRef" />
+    <TreeInfo :id="selectedTreeID" @unselect="unselectTree()" @center="showTree" ref="treeInfoRef" />
     <LocationBannerComponent v-if="showLocationBanner" @accept="getGeolocation()"
       @cancel="showLocationBanner = false" />
   </div>
@@ -57,76 +57,77 @@ function addTreeLayer() {
       'type': 'FeatureCollection',
       'features': boundingTrees.value
     },
-    cluster: true,
-    clusterMaxZoom: 15, // Max zoom to cluster points on
-    clusterRadius: 150
   })
-  map.addLayer({
-    id: 'clusters',
-    type: 'circle',
-    source: 'trees',
-    filter: ['has', 'point_count'],
-    paint: {
-      // Use step expressions (https://docs.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-      // with three steps to implement three types of circles:
-      //   * Blue, 20px circles when point count is less than 100
-      //   * Yellow, 30px circles when point count is between 100 and 750
-      //   * Pink, 40px circles when point count is greater than or equal to 750
-      'circle-color': [
-        'step',
-        ['get', 'point_count'],
-        '#7FA776',
-        100,
-        '#507C58',
-        500,
-        '#344E41'
-      ],
-      'circle-radius': [
-        'step',
-        ['get', 'point_count'],
-        20,
-        100,
-        30,
-        750,
-        40
-      ]
-    }
-  });
-  map.addLayer({
-    id: 'cluster-count',
-    type: 'symbol',
-    source: 'trees',
-    filter: ['has', 'point_count'],
-    layout: {
-      'text-field': [
-        'step',
-        ['get', 'point_count'],
-        '10+',
-        100,
-        '100+',
-        500,
-        '500+'
-      ],
-      'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-      'text-size': 12,
+
+  map.addLayer(
+    {
+      'id': 'trees-heat',
+      'type': 'heatmap',
+      'source': 'trees',
+      'maxzoom': 16,
+      'paint': {
+        // increase weight as diameter breast height increases
+        'heatmap-weight': {
+          'property': 'dbh',
+          'type': 'exponential',
+          'stops': [
+            [1, 0],
+            [100, 1]
+          ]
+        },
+        // increase intensity as zoom level increases
+        'heatmap-intensity': {
+          'stops': [
+            [13, 1],
+            [16, 3]
+          ]
+        },
+        // use sequential color palette to use exponentially as the weight increases
+        'heatmap-color': [
+          'interpolate',
+          ['linear'],
+          ['heatmap-density'],
+          0,
+          'rgba(127, 167, 118, 0)',
+          0.2,
+          'rgba(127, 167, 118, 0.2)',
+          0.4,
+          'rgba(127, 167, 118, 0.4)',
+          0.6,
+          'rgba(60, 163, 79, 0.4)',
+          0.8,
+          'rgba(60, 163, 79, 0.6)',
+        ],
+        // increase radius as zoom increases
+        'heatmap-radius': {
+          'stops': [
+            [13, 15],
+            [16, 20]
+          ]
+        },
+        // decrease opacity to transition into the circle layer
+        'heatmap-opacity': {
+          'default': 1,
+          'stops': [
+            [15, 1],
+            [16, 0]
+          ]
+        }
+      }
     },
-    paint: {
-      "text-color": "#ffffff",
-      "text-halo-color": "rgba(0,0,0,0.4)",
-      "text-halo-width": 1,
-      "text-halo-blur": 1
-    }
-  });
+    'waterway-label'
+  );
   map.addLayer({
     id: 'trees-layer',
     type: 'circle',
     source: 'trees',
+    'minzoom': 15,
     filter: ['!', ['has', 'point_count']],
     paint: {
       'circle-stroke-color': [
         'case',
         ['boolean', ['feature-state', 'selected'], false],
-        '#446e42',
+        '#4a0599',
         '#446e42'
       ],
       'circle-stroke-width': [
@@ -227,6 +228,11 @@ async function generateMap() {
   map.on('moveend', () => {
     loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
   });
+
+  map.setLayoutProperty('country-label', 'text-field', [
+    'get',
+    `name_de`
+  ]);
 }
 
 

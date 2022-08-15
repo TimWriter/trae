@@ -1,4 +1,5 @@
 <template>
+  <div class="bg"></div>
   <div class="location-banner">
     <h4>Standortabfrage</h4>
     <p>
@@ -41,10 +42,11 @@ function iOS() {
   box-shadow: 0px 0px 15px rgba($color: #000000, $alpha: .2);
   text-align: left;
   z-index: 5;
+  font-family: 'Lato', sans-serif;
 
   @media only screen and (max-width: 500px) {
     width: calc(100% - 6em);
-    bottom: 1em;
+    bottom: 2.2em;
   }
 
   h4 {
@@ -64,6 +66,12 @@ function iOS() {
       -webkit-appearance: none;
       cursor: pointer;
       margin-right: .5em;
+      font-weight: 600;
+      font-family: 'Lato', sans-serif;
+
+      @media only screen and (max-width: 500px) {
+        font-size: .8em;
+      }
 
       &:hover {
         background-color: rgb(236, 236, 236);
@@ -99,13 +107,27 @@ function iOS() {
       padding: .4em;
       border-radius: 4px;
       margin: .2em 0;
+      line-height: 1.4em;
 
       i {
         position: absolute;
-        right: 4px;
-        top: 4px;
+        right: .3em;
+        top: .3em;
       }
     }
+  }
+}
+
+.bg {
+  @media only screen and (max-width: 500px) {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    z-index: 4;
+    backdrop-filter: blur(2px);
+    background-color: rgba($color: #000000, $alpha: .3);
   }
 }
 </style>

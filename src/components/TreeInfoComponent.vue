@@ -1,5 +1,8 @@
 <template>
   <div class="tree-info" v-if="tree">
+    <div class="center" @click="$emit('center', tree)">
+      <i class="bi bi-geo"></i>
+    </div>
     <div class="close" @click="$emit('unselect')">
       <i class="bi bi-x"></i>
     </div>
@@ -23,7 +26,7 @@
       </div>
       <div class="row" v-if="showFullInfo">
         <div class="label">Stammumfang</div>
-        <div class="value">{{ tree.circumference }}</div>
+        <div class="value">{{ tree.circumference }} cm</div>
       </div>
       <div class="row" v-if="showFullInfo">
         <div class="label">Kronendurchmesser</div>
@@ -96,9 +99,33 @@ getTreeFromDB()
     border-radius: 20px 20px 0 0;
   }
 
+  .center {
+    position: absolute;
+    left: 1.5em;
+    top: 1em;
+    cursor: pointer;
+    border-radius: 50%;
+    width: 2em;
+    height: 2em;
+    transition-duration: .2s;
+    color: #7FA776;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    &:hover {
+      background-color: #7FA77633;
+    }
+
+    i {
+      margin-top: -3px;
+      font-size: 1.2em;
+    }
+  }
+
   .close {
     position: absolute;
-    right: 1em;
+    right: 1.5em;
     top: 1em;
     cursor: pointer;
     border-radius: 50%;

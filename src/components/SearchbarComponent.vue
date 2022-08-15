@@ -11,7 +11,7 @@
             <i v-if="searchBarModel.charAt(0) === '#'" class="bi bi-pin-map"></i>
             <i v-else class="bi bi-geo-alt"></i>
           </div>
-          <div class="name" v-if="searchBarModel.charAt(0) !== '#'">
+          <div class="name" v-if="item.display_name">
             <span v-if="item.display_name.split(',')[0].length > 1">
               {{ item.display_name.split(',')[0] }}
             </span>
@@ -36,7 +36,7 @@
 <script setup lang="ts">
 import "bootstrap-icons/font/bootstrap-icons.css";
 import TreeHelperService from '@/helpers/TreeHelperService'
-import { nextTick, ref } from "vue";
+import { ref } from "vue";
 import axios from "axios"
 
 const isExtended = ref(false)
@@ -87,6 +87,9 @@ async function searchAPI() {
     const trees = await TreeHelperService.getTreesByTreeNumber(searchBarModel.value.split('#')[1])
     console.log(trees)
     if (trees !== null) results.value = trees
+  }
+  if (results.value.length < 1) {
+    results.value = [{ 'tree_nr': '', 'display_name': 'Kein Ergebnis', address: { city: '' } }]
   }
 }
 
