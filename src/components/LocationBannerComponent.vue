@@ -1,0 +1,111 @@
+<template>
+  <div class="location-banner">
+    <h4>Standortabfrage</h4>
+    <p>
+      Bitte teile deinen Standort mit uns, um alle Features dieser Seite nutzen zu können.<br>
+      <span class="info">
+        <i class="bi bi-info-circle"></i>
+        Deine Daten werden nicht gespeichert.
+      </span>
+      <span class="info iphone" v-if="iOS()">
+        <span class="path">
+          "Einstellungen" > "Datenschutz" > "Ortungsdienste" > "Safari"
+          <i class="bi bi-gear-fill"></i>
+        </span>
+        muss auf "Beim Verwenden" gesetzt sein.
+      </span>
+    </p>
+    <div class="buttons">
+      <button @click="emit('cancel')">Lieber nicht</button>
+      <button @click="emit('accept')">Standort teilen</button>
+    </div>
+  </div>
+</template>
+<script setup lang="ts">
+
+const emit = defineEmits(['cancel', 'accept'])
+function iOS() {
+  return !!navigator.platform && /iPad|iPhone|iPod/.test(navigator.platform);
+}
+</script>
+<style lang="scss">
+.location-banner {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, 0);
+  bottom: 3em;
+  background-color: #fff;
+  padding: 2em;
+  border: 1px solid #ddd;
+  border-radius: 20px;
+  box-shadow: 0px 0px 15px rgba($color: #000000, $alpha: .2);
+  text-align: left;
+  z-index: 5;
+
+  @media only screen and (max-width: 500px) {
+    width: calc(100% - 6em);
+    bottom: 1em;
+  }
+
+  h4 {
+    margin: 0 0;
+    text-align: left;
+  }
+
+  .buttons {
+    display: flex;
+
+    button {
+      color: #777;
+      background-color: #fff;
+      border: 2px solid #777;
+      padding: .6em 1em;
+      border-radius: 6px;
+      -webkit-appearance: none;
+      cursor: pointer;
+      margin-right: .5em;
+
+      &:hover {
+        background-color: rgb(236, 236, 236);
+      }
+
+      &:nth-child(2) {
+        color: #9b64d9;
+        border: 2px solid #9b64d9;
+
+        &:hover {
+          background-color: rgb(251, 244, 251);
+        }
+      }
+    }
+  }
+
+  .info {
+    display: block;
+    color: #5e5a62;
+    font-size: .9em;
+    margin: .8em 0 1.6em 0;
+
+    i {
+      font-size: .9em;
+    }
+  }
+
+  .iphone {
+    .path {
+      position: relative;
+      display: block;
+      background-color: rgb(219, 219, 219);
+      padding: .4em;
+      border-radius: 4px;
+      margin: .2em 0;
+
+      i {
+        position: absolute;
+        right: 4px;
+        top: 4px;
+      }
+    }
+  }
+}
+</style>

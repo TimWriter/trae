@@ -139,7 +139,8 @@ getTreeFromDB()
       .show-more {
         margin: 1em auto 0 auto;
         font-weight: 500;
-        color: rgb(82, 163, 76);
+        font-size: .9em;
+        color: #9b64d9;
         cursor: pointer;
 
         i {

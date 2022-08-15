@@ -5,7 +5,7 @@
         ref="searchBarRef" autocomplete="false" placeholder="Adresse, #Baumnummer">
       <i v-if="!isExtended" class="bi bi-search"></i>
       <i v-else class="bi bi-x" @click="closeSearchbar()"></i>
-      <div v-if="results.length > 0" class="results">
+      <div v-if="results.length > 0 && isExtended" class="results">
         <div class="row" v-for="item in results" :key="item" @click="showSearchResult(item)">
           <div class="icon">
             <i v-if="searchBarModel.charAt(0) === '#'" class="bi bi-pin-map"></i>
@@ -157,7 +157,7 @@ function showSearchResult(result: any) {
 
       &:focus {
         outline: none;
-        border: 1px solid rgb(95, 95, 95);
+        border: 1px solid #9b64d9;
       }
     }
 
