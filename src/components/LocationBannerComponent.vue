@@ -4,16 +4,16 @@
     <h4>Standortabfrage</h4>
     <p>
       Bitte teile deinen Standort mit uns, um alle Features dieser Seite nutzen zu können.<br>
-      <span class="info">
-        <i class="bi bi-info-circle"></i>
-        Deine Daten werden nicht gespeichert.
-      </span>
       <span class="info iphone" v-if="iOS()">
         <span class="path">
           "Einstellungen" > "Datenschutz" > "Ortungsdienste" > "Safari"
           <i class="bi bi-gear-fill"></i>
         </span>
         muss auf "Beim Verwenden" gesetzt sein.
+      </span>
+      <span class="info">
+        <i class="bi bi-info-circle"></i>
+        Deine Daten werden nicht gespeichert.
       </span>
     </p>
     <div class="buttons">

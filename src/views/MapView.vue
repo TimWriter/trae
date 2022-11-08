@@ -3,7 +3,8 @@
     <div id="map-container">
     </div>
     <SearchbarComponent @showPOI="showPOI" @showTree="showTree" />
-    <TreeInfo :id="selectedTreeID" @unselect="unselectTree()" @center="showTree" ref="treeInfoRef" />
+    <TreeInfo :id="selectedTreeID" :height="heightLookup" :crown="crownLookup" @unselect="unselectTree()"
+      @center="showTree" ref="treeInfoRef" />
     <LocationBannerComponent v-if="showLocationBanner" @accept="getGeolocation()"
       @cancel="showLocationBanner = false" />
   </div>
@@ -25,7 +26,10 @@ const showLocationBanner = ref(false)
 const geolocation = ref(null)
 let isTouch = 'ontouchstart' in window || navigator.maxTouchPoints;
 let poiMarker: any | null = null;
-
+let heightLookup = ref(null)
+let crownLookup = ref(null)
+TreeHelperService.getHeightLookup().then(value => { heightLookup.value = value })
+TreeHelperService.getCrownDiameterLookup().then(value => { crownLookup.value = value })
 
 function selectTree(id: number) {
   selectedTreeID.value = id;
@@ -229,7 +233,7 @@ async function generateMap() {
     loadTrees(map.getCenter(), map.getBounds(), map.getZoom())
   });
 
-  map.setLayoutProperty('country-label', 'text-field', [
+  map.setLayoutProperty('country-label', 'text-field', 'poi-label', 'road-label', 'settlement-label', [
     'get',
     `name_de`
   ]);

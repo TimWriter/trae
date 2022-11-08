@@ -18,19 +18,25 @@
       </div>
       <div class="row" v-if="showFullInfo">
         <div class="label">Pflanzjahr</div>
-        <div class="value">{{ tree.year }}</div>
+        <div class="value" v-if="tree.year !== 'n.a.'">{{ tree.year }}</div>
+        <div class="value" v-else>nicht verfügbar</div>
       </div>
       <div class="row" v-if="showFullInfo">
         <div class="label">Baumhöhe</div>
-        <div class="value">{{ tree.height }}</div>
+        <div class="value">
+          {{ getHeight(tree) }}
+        </div>
       </div>
       <div class="row" v-if="showFullInfo">
         <div class="label">Stammumfang</div>
-        <div class="value">{{ tree.circumference }} cm</div>
+        <div class="value" v-if="tree.circumference !== 'n.a.'">{{ tree.circumference }} cm</div>
+        <div class="value" v-else>nicht verfügbar</div>
       </div>
       <div class="row" v-if="showFullInfo">
         <div class="label">Kronendurchmesser</div>
-        <div class="value">{{ tree.crowndiameter }}</div>
+        <div class="value">
+          {{ getCrown(tree) }}
+        </div>
       </div>
       <div class="row" v-if="!showFullInfo">
         <div class="show-more" @click="showFullInfo = true">
@@ -53,7 +59,9 @@ import { FullTree } from '@/typings/typings';
 import { nextTick, ref } from 'vue';
 import "bootstrap-icons/font/bootstrap-icons.css";
 const props = defineProps<{
-  id: number | null
+  id: number | null,
+  height: { id: number, min: string, max: string }[] | null,
+  crown: { id: number, min: string, max: string }[] | null
 }>()
 const tree = ref<FullTree | null>(null)
 const isMobile = ref(window.innerWidth < 500)
@@ -68,6 +76,32 @@ function getTreeFromDB() {
       tree.value = null
     }
   })
+}
+
+function getHeight(tree: FullTree) {
+  if (tree.height !== 'n.a.') {
+    if (tree.id < 213680) {
+      const lookup = props.height?.find(x => x.id === parseInt(tree.height))
+      return `${lookup?.min} - ${lookup?.max} m`
+    } else {
+      return tree.height + ' m'
+    }
+
+  }
+  return 'nicht verfügbar'
+}
+
+function getCrown(tree: FullTree) {
+  if (tree.crowndiameter !== 'n.a.') {
+    console.log(tree.id)
+    if (tree.id < 213680) {
+      const lookup = props.crown?.find(x => x.id === parseInt(tree.crowndiameter))
+      return `${lookup?.min} - ${lookup?.max} m`
+    } else {
+      return tree.crowndiameter + ' m'
+    }
+  }
+  return 'nicht verfügbar'
 }
 
 defineExpose({

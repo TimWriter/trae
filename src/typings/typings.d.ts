@@ -4,10 +4,10 @@ export interface FullTree {
   long: number
   tree_nr: string
   name: string
-  year: "2012"
-  height: "3"
-  circumference: "99"
-  crowndiameter: "2"
+  year: string
+  height: string
+  circumference: string
+  crowndiameter: string
 }
 
 export interface Tree {

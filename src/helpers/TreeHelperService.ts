@@ -4,7 +4,7 @@ import { MapBoxCoordinates, FullTree} from "@/typings/typings"
 export default{
   async getAllBoundingTreesGeoJSON(bounds: { _sw:MapBoxCoordinates,_ne:MapBoxCoordinates }):Promise<object[]> {
     const { data: trees, error } = await supabase
-    .from('trees')
+    .from('TreesTable')
     .select('id,lat,long')
     .gt('lat', bounds._sw.lat)
     .gt('long', bounds._sw.lng)
@@ -33,7 +33,7 @@ export default{
   
   async getTree(id: number):Promise<FullTree | null> {
     const { data: tree, error } = await supabase
-    .from('trees')
+    .from('TreesTable')
     .select('*')
     .eq('id', id)
     .range(0, 1)
@@ -48,7 +48,7 @@ export default{
 
   async getTreesByTreeNumber(treeNr: string):Promise<FullTree[] | null>{
     const { data: trees, error } = await supabase
-    .from('trees')
+    .from('TreesTable')
     .select('*')
     .eq('tree_nr', treeNr)
 
@@ -58,5 +58,31 @@ export default{
     }
 
     return trees !== null ? trees : null
+  },
+
+  async getHeightLookup():Promise<any | null>{
+    const { data: HeightLookupTable, error } = await supabase
+    .from('HeightLookupTable')
+    .select('*')
+
+    if(error) {
+      console.log("An error occured while loading the supabase database.", error)
+      return null
+    }
+
+    return HeightLookupTable !== null ? HeightLookupTable : null
+  },
+
+  async getCrownDiameterLookup():Promise<any | null>{
+    const { data: CrowndiameterLookupTable, error } = await supabase
+    .from('CrowndiameterLookupTable')
+    .select('*')
+
+    if(error) {
+      console.log("An error occured while loading the supabase database.", error)
+      return null
+    }
+
+    return CrowndiameterLookupTable !== null ? CrowndiameterLookupTable : null
   }
 }
