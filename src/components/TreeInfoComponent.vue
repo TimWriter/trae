@@ -133,6 +133,12 @@ getTreeFromDB()
     border-radius: 20px 20px 0 0;
   }
 
+  @media all and (display-mode: standalone) {
+    .show-more {
+      margin: 1em auto 1.5em auto !important;
+    }
+  }
+
   .center {
     position: absolute;
     left: 1.5em;
